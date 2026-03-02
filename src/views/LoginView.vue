@@ -13,7 +13,7 @@
                         </div>
                         <input type="password" class="auth__input" placeholder="Enter your Password" required/>
                     </div>
-                    <button class="auth__button button" type="button">
+                    <button @click="$router.push({ name: 'deliveries' })" class="auth__button button" type="button">
                         Войти
                     </button>
                 </form>
