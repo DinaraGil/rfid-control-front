@@ -2,18 +2,31 @@
     <main class="content">
         <section class="section container">
             <div class="auth">
-                <form class="auth__form">
+                <form @submit.prevent="login" class="auth__form">
                     <div class="auth__field">
                         <div class="auth__description">
                             <p>Username</p>
                         </div>
-                        <input type="text" class="auth__input" placeholder="Enter your Username" required/>
+                        <input
+                            type="text"
+                            class="auth__input"
+                            placeholder="Enter your Username"
+                            v-model="username"
+                            required
+                        />
                         <div class="auth__description">
                             <p>Password</p>
                         </div>
-                        <input type="password" class="auth__input" placeholder="Enter your Password" required/>
+                        <input
+                            type="password"
+                            class="auth__input"
+                            placeholder="Enter your Password"
+                            v-model="password"
+                            required
+                        />
                     </div>
-                    <button @click="$router.push({ name: 'deliveries' })" class="auth__button button" type="button">
+                    <button type="submit" class="auth__button button">
+                        <!-- @click="$router.push({ name: 'deliveries' })" -->
                         Войти
                     </button>
                 </form>
@@ -50,3 +63,41 @@
     }
 </style>
 
+<script lang="ts">
+export default {
+    data() {
+        return {
+            username: "",
+            password: "",
+        };
+    },
+    methods: {
+        async login() {
+            try {
+                const response = await fetch("/api/auth/login", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        username: this.username,
+                        password: this.password,
+                    }),
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    // Сохранить токен/данные пользователя
+                    // Перенаправить на страницу deliveries
+                    this.$router.push({ name: 'deliveries' });
+                } else {
+                    // Обработка ошибки авторизации
+                    console.error('Login failed');
+                }
+            } catch (error) {
+                console.error('Network error:', error);
+            }
+        },
+    },
+};
+</script>
