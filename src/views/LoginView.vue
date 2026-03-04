@@ -29,6 +29,7 @@
                         <!-- @click="$router.push({ name: 'deliveries' })" -->
                         Войти
                     </button>
+                    <div v-if="error">{{  error }}</div>
                 </form>
             </div>
       </section>
@@ -69,10 +70,12 @@ export default {
         return {
             username: "",
             password: "",
+            error: "",
         };
     },
     methods: {
         async login() {
+            this.error = "";
             try {
                 const response = await fetch("/api/auth/login", {
                     method: "POST",
@@ -93,9 +96,13 @@ export default {
                 } else {
                     // Обработка ошибки авторизации
                     console.error('Login failed');
+                    const errorData = await response.json();
+                    this.error = errorData.error;
+//                    this.error = await response.text();
                 }
-            } catch (error) {
-                console.error('Network error:', error);
+            } catch (err) {
+                console.error('Network error:', err);
+                this.error = "Ошибка авторизации";
             }
         },
     },
