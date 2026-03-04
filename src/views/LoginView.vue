@@ -2,7 +2,7 @@
     <main class="content">
         <section class="section container">
             <div class="auth">
-                <form @submit.prevent="login" class="auth__form">
+                <form @submit.prevent="handleLogin" class="auth__form">
                     <div class="auth__field">
                         <div class="auth__description">
                             <p>Username</p>
@@ -65,6 +65,8 @@
 </style>
 
 <script lang="ts">
+import { useUserStore } from '@/stores/user'
+
 export default {
     data() {
         return {
@@ -74,35 +76,14 @@ export default {
         };
     },
     methods: {
-        async login() {
+        async handleLogin() {
             this.error = "";
             try {
-                const response = await fetch("/api/auth/login", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        username: this.username,
-                        password: this.password,
-                    }),
-                });
-                
-                if (response.ok) {
-                    const data = await response.json();
-                    // Сохранить токен/данные пользователя
-                    // Перенаправить на страницу deliveries
-                    this.$router.push({ name: 'deliveries' });
-                } else {
-                    // Обработка ошибки авторизации
-                    console.error('Login failed');
-                    const errorData = await response.json();
-                    this.error = errorData.error;
-//                    this.error = await response.text();
-                }
-            } catch (err) {
-                console.error('Network error:', err);
-                this.error = "Ошибка авторизации";
+                const userStore = useUserStore()
+                await userStore.login({ username: this.username, password: this.password });
+            } catch (err: any) {
+                console.log("error catched in loginVue", err)
+                this.error = err.message || "Ошибка";
             }
         },
     },
