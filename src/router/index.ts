@@ -1,10 +1,10 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
 import LoginView from '@/views/LoginView.vue'
 import MainPageView from '@/views/MainPageView.vue'
 import DeliveryView from '@/views/DeliveryView.vue'
 import AllDeliveriesView from '@/views/AllDeliveriesView.vue'
 import AddDeliveryView from '@/views/AddDeliveryView.vue'
+import SuppliersView from '@/views/SuppliersView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -28,13 +28,25 @@ const router = createRouter({
       path: '/deliveries/all',
       name: 'all-deliveries',
       component: AllDeliveriesView,
-      meta: {menuKey: 'all-deliveries', menuTitle: 'Просмотр поставок'}
+      meta: {section: 'deliveries'}
     },
     {
       path: '/deliveries/add',
       name: 'add-delivery',
       component: AddDeliveryView,
-      meta: {menuKey: 'add-delivery', menuTitle: 'Добавление поставок'}
+      meta: {section: 'deliveries'}
+    },
+    {
+      path: '/suppliers/all',
+      name: 'all-suppliers',
+      component: SuppliersView,
+      meta: {section: 'suppliers'}
+    },
+    {
+      path: '/suppliers/add',
+      name: 'add-suppliers',
+      component: SuppliersView,
+      meta: {section: 'suppliers'}
     },
   ],
 })

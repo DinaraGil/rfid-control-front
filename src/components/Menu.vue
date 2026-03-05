@@ -2,7 +2,7 @@
     <div class="menu">
             <ul class="menu__list">
                 <li 
-                    v-for="item in menuItems" 
+                    v-for="item in currentItems" 
                     :key="item.path"
                     class="menu__item"
                     :class="{ 'menu__item--active': isActive(item.path) }"
@@ -86,10 +86,21 @@ import { computed } from 'vue'
 
 const route = useRoute()
 
-const menuItems = [
-    { path: '/deliveries/all', title: 'Просмотр поставок' },
-    { path: '/deliveries/add', title: 'Добавление поставок' },
-]
+const menuItems: Record<string, Array<{path: string, title: string}>> = {
+    'deliveries': [{path: '/deliveries/all', title: 'Просмотр поставок'}, {path: '/deliveries/add', title: 'Добавление поставок'}],
+    'suppliers': [{path: '/suppliers/all', title: 'Просмотр поставщиков'}, {path: '/suppliers/add', title: 'Добавление поставщика'}],
+}
+
+
+const currentSection = computed(() => {
+    return route.meta?.section as string || null
+})
+
+const currentItems = computed(() => {
+    if (!currentSection.value) return []
+
+    return menuItems[currentSection.value] || []
+})
 
 const isActive = (path: string) => {
     return route.path === path || route.path.startsWith(path + '/')

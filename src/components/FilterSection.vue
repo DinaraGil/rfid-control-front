@@ -21,9 +21,6 @@
                             </form>
                         </li>
                     </ul>
-                    <button class="filter__add button" type="button">
-                        Добавить товар
-                    </button>
                 </div>
             </div>
         </section>

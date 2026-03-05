@@ -11,8 +11,8 @@
                             width="50" height="50" loading="lazy"
                     />
                 </router-link>
-                <div v-if="userStore.isAuthenticated">
-                    <router-link :to="{ name: 'deliveries'}" class="header__section">
+                <div v-if="userStore.isAuthenticated" class="header__part">
+                    <router-link :to="{ name: 'all-deliveries'}" class="header__section">
                         <div class="header__icon">
                             <img
                                 class="logo__image"
@@ -25,6 +25,21 @@
                         </div>
                         <div class="header__description">
                             <p>Поставки</p>
+                        </div>
+                    </router-link>
+                    <router-link :to="{ name: 'all-suppliers'}" class="header__section">
+                        <div class="header__icon">
+                            <img
+                                class="logo__image"
+                                src="/images/icons/suppliers.svg"
+                                alt="suppliers_icon"
+                                width="24"
+                                height="24"
+                                loading="lazy"
+                            />
+                        </div>
+                        <div class="header__description">
+                            <p>Поставщики</p>
                         </div>
                     </router-link>
                 </div>    
@@ -76,6 +91,11 @@
             background-color: rgba(255, 255, 255, 0.1);
         }   
 
+    }
+    &__part {
+        display: flex;
+        justify-content: space-between;
+        column-gap: var(--base-padding);
     }
     &__logo {
         @include hover{
