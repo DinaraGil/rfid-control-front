@@ -24,7 +24,7 @@
                             />
                         </div>
                         <div class="header__description">
-                            <p>Товары</p>
+                            <p>Поставки</p>
                         </div>
                     </router-link>
                 </div>    
