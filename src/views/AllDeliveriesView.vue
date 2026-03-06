@@ -1,7 +1,10 @@
 <script setup lang="ts">
     import { ref, onMounted } from 'vue'
+    import { useRouter } from 'vue-router'
     import FilterSection from '@/components/FilterSection.vue'
     import Menu from '@/components/Menu.vue'
+
+    const router = useRouter();
 
     interface Delivery {
         delivery_id: number
@@ -77,13 +80,19 @@ const getStatusColor = (status: string) => {
     return colorMap[status] || 'status--default'
 }
 
-
     onMounted(() => {
         fetchDeliveries()
     })
 
     const refreshData = () => {
         fetchDeliveries()
+    }
+
+    const rowClicked = (delivery_id: number) => {
+        router.push({ 
+            name: 'deliveriy-lists', 
+            params: { id: delivery_id } 
+        })
     }
 </script>
 
@@ -119,7 +128,7 @@ const getStatusColor = (status: string) => {
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr v-for="delivery in deliveries" :key="delivery.delivery_id">
+                                <tr v-for="delivery in deliveries" :key="delivery.delivery_id" @click="rowClicked(delivery.delivery_id)" class="table-section--active">
                                     <td>{{ delivery.delivery_id }}</td>
                                     <td>
                                         <span :class="['status', getStatusColor(delivery.status)]">
@@ -147,6 +156,16 @@ const getStatusColor = (status: string) => {
 </template>
 
 <style lang="scss">
+.table {
+    &-section {
+        &--active {
+            @include hover {
+                background-color: blue;
+                cursor: pointer;
+            } 
+        }
+    }
+}
     .status {
         display: inline-block;
         padding: 4px 8px;
