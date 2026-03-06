@@ -84,7 +84,7 @@
         <section class="section container">
             <div class="section__body">
                 <button v-if="userStore.isWorker" type="button" class="start__button button" @click="$router.push({ name: 'start-deliveriy-lists' })">
-                    Начать прием
+                    Закончить прием
                 </button>
                 <div class="table-section">
                     <div class="table-section__body">

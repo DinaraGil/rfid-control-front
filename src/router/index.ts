@@ -7,6 +7,7 @@ import AddDeliveryView from '@/views/AddDeliveryView.vue'
 import SuppliersView from '@/views/SuppliersView.vue'
 import AllDeliveryListsView from '@/views/AllDeliveryListsView.vue'
 import ListByDeliveryID from '@/views/ListByDeliveryID.vue'
+import StartDelivery from '@/views/StartDelivery.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -37,6 +38,12 @@ const router = createRouter({
       path: '/deliveries/:id/lists',
       name: 'deliveriy-lists',
       component: ListByDeliveryID,
+      meta: {section: 'deliveries'}
+    },
+    {
+      path: '/deliveries/:id/lists/start',
+      name: 'start-deliveriy-lists',
+      component: StartDelivery,
       meta: {section: 'deliveries'}
     },
     {

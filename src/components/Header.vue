@@ -1,6 +1,12 @@
 
 <template>
-    <header class="header">
+    <header
+        class="header"
+        :class="{
+            'header--admin': userStore.isAdmin,
+            'header--worker': userStore.isWorker
+        }"
+    >
       <div class="header__inner container">
             <div class="header__menu">
                 <router-link :to="{ name: 'home'}" class="header__logo logo">
@@ -132,6 +138,12 @@
         column-gap: var(--padding-medium);
         align-items: center;        
     }
+
+     &--worker {
+        .header__inner {
+            background: var(--color-dark-green);
+        }
+     }
 }
 </style>
 

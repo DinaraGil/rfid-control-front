@@ -4,6 +4,7 @@ import router from '@/router'
 interface User {
     id: number
     username: string
+    role_id: number
 }
 
 export const useUserStore = defineStore('user', {
@@ -12,6 +13,11 @@ export const useUserStore = defineStore('user', {
     token: localStorage.getItem('token') || null,
     isAuthenticated: !!localStorage.getItem('token'),
   }),
+  getters: {
+    isAdmin: (state) => state.user?.role_id === 1,
+
+    isWorker: (state) => state.user?.role_id === 2,
+  },
   actions: {
     async login({ username, password }) {
         try {
@@ -36,7 +42,8 @@ export const useUserStore = defineStore('user', {
 
             this.user = {
                 id: data.id,
-                username: data.username
+                username: data.username,
+                role_id: data.role_id
             }
            
             this.token = data.token;
