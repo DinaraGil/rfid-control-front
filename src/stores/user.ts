@@ -46,7 +46,7 @@ export const useUserStore = defineStore('user', {
             }
             this.isAuthenticated = true;
 
-            router.push({ name: 'deliveries' });
+            router.push({ name: 'all-deliveries' });
             return data;
         } catch (error) {
             throw error;

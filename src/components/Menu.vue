@@ -87,7 +87,11 @@ import { computed } from 'vue'
 const route = useRoute()
 
 const menuItems: Record<string, Array<{path: string, title: string}>> = {
-    'deliveries': [{path: '/deliveries/all', title: 'Просмотр поставок'}, {path: '/deliveries/add', title: 'Добавление поставок'}],
+    'deliveries': [
+        {path: '/deliveries/lists', title: 'Просмотр листов поставок'},
+        {path: '/deliveries/all', title: 'Просмотр поставок'},
+        {path: '/deliveries/add', title: 'Добавление поставок'},
+    ],
     'suppliers': [{path: '/suppliers/all', title: 'Просмотр поставщиков'}, {path: '/suppliers/add', title: 'Добавление поставщика'}],
 }
 

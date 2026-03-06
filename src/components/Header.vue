@@ -12,7 +12,11 @@
                     />
                 </router-link>
                 <div v-if="userStore.isAuthenticated" class="header__part">
-                    <router-link :to="{ name: 'all-deliveries'}" class="header__section">
+                    <router-link
+                        :to="{ name: 'all-deliveries'}"
+                        class="header__section"
+                        :class="{ 'header__section--active': isPathActive('/deliveries') }"
+                    >
                         <div class="header__icon">
                             <img
                                 class="logo__image"
@@ -27,7 +31,11 @@
                             <p>Поставки</p>
                         </div>
                     </router-link>
-                    <router-link :to="{ name: 'all-suppliers'}" class="header__section">
+                    <router-link
+                        :to="{ name: 'all-suppliers'}"
+                        class="header__section"
+                        :class="{ 'header__section--active': isPathActive('/suppliers') }"
+                    >
                         <div class="header__icon">
                             <img
                                 class="logo__image"
@@ -91,6 +99,10 @@
             background-color: rgba(255, 255, 255, 0.1);
         }   
 
+         &--active {
+            color: var(--color-light-blue);
+            background-color: rgba(255, 255, 255, 0.15);
+         }
     }
     &__part {
         display: flex;
@@ -125,14 +137,19 @@
 
 <script setup lang="ts">
     import { useUserStore } from '@/stores/user'
-    import { useRouter } from 'vue-router'
+    import { useRoute, useRouter } from 'vue-router'
 
     const userStore = useUserStore()
     const router = useRouter()
+    const route = useRoute()
 
     const handleLogout = () => {
         userStore.logout()
         router.push({ name: 'home' })
+    }
+
+    const isPathActive = (path: string) => {
+        return route.path.startsWith(path)
     }
 
 </script>
