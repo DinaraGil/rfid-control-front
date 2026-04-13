@@ -9,6 +9,8 @@
     const router = useRouter()
     const deliveryID = ref(route.params.id)
     const userStore = useUserStore()
+    const socket = ref<WebSocket | null>(null)
+    const isScanning = ref(false)
 
     interface DeliveryList {
         delivery_list_id: number
@@ -16,6 +18,7 @@
         supplier_id: number
         amount: number
         article: string
+        scanned?: boolean
         created_by: number
         updated_by: number
         created_at: string
@@ -65,13 +68,43 @@
 
     onMounted(() => {
         fetchDeliveryLists()
+        connectSocket()
     })
 
     const refreshData = () => {
         fetchDeliveryLists()
     }
 
+const handleScanEvent = (data: any) => {
+  const { article } = data
+  const item = deliveryLists.value.find(l => l.article === article)
+  if (item) {
+    item.scanned = true
+  }
+}
 
+const connectSocket = () => {
+  socket.value = new WebSocket('ws://localhost:8080/ws/scan')
+
+  socket.value.onmessage = (event) => {
+    const data = JSON.parse(event.data)
+    handleScanEvent(data)
+  }
+
+  socket.value.onclose = () => {
+    console.log('WS closed')
+  }
+}
+
+const toggleScan = () => {
+  if (!isScanning.value) {
+    connectSocket()
+  } else {
+    socket.value?.close()
+  }
+
+  isScanning.value = !isScanning.value
+}
 
 </script>
 
@@ -83,8 +116,11 @@
         
         <section class="section container">
             <div class="section__body">
-                <button v-if="userStore.isWorker" type="button" class="start__button button" @click="$router.push({ name: 'start-deliveriy-lists' })">
-                    Закончить прием
+                <button
+                v-if="userStore.isWorker"
+                @click="toggleScan"
+                >
+                {{ isScanning ? 'Закончить прием' : 'Начать прием' }}
                 </button>
                 <div class="table-section">
                     <div class="table-section__body">
@@ -111,7 +147,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr v-for="list in deliveryLists" :key="list.delivery_list_id">
+                                <tr v-for="list in deliveryLists" :key="list.delivery_list_id" :class="{ 'row--scanned': list.scanned }">
                                     <td>{{ list.delivery_list_id }}</td>
                                     <td>{{ list.delivery_id }}</td>
                                     <td>{{ list.supplier_id }}</td>
@@ -136,6 +172,16 @@
 </template>
 
 <style lang="scss">
+    .row--scanned {
+  background-color: #e8f5e8;
+  animation: flash 0.5s ease;
+}
+
+@keyframes flash {
+  from { background-color: #fff59d; }
+  to { background-color: #e8f5e8; }
+}
+
     .start {
         &__button {
             background-color: var(--color-green);

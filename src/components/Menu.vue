@@ -11,17 +11,6 @@
                         {{ item.title }}
                     </router-link>
                 </li>
-<!--                 
-                <li class="menu__item">
-                    <a class="menu__link" href="/">
-                        <p>Просмотр поставок</p>
-                    </a>
-                </li>
-                <li class="menu__item">
-                    <a class="menu__link" href="/">
-                        <p>Добавить поставку</p>
-                    </a>
-                </li> -->
             </ul>
         </div>
 </template>
@@ -81,20 +70,34 @@
 </style>
 
 <script setup lang="ts">
-    import { useRoute } from 'vue-router'
+import { useRoute } from 'vue-router'
 import { computed } from 'vue'
+import { useUserStore } from '@/stores/user'
 
+const userStore = useUserStore()
 const route = useRoute()
 
-const menuItems: Record<string, Array<{path: string, title: string}>> = {
-    'deliveries': [
-        {path: '/deliveries/lists', title: 'Просмотр листов поставок'},
-        {path: '/deliveries/all', title: 'Просмотр поставок'},
-        {path: '/deliveries/add', title: 'Добавление поставок'},
-    ],
-    'suppliers': [{path: '/suppliers/all', title: 'Просмотр поставщиков'}, {path: '/suppliers/add', title: 'Добавление поставщика'}],
-}
 
+// const menuItems: Record<string, Array<{path: string, title: string}>> = {
+//     'deliveries': [
+//         {path: '/deliveries/lists', title: 'Просмотр листов поставок'},
+//         {path: '/deliveries/all', title: 'Просмотр поставок'},
+//         {path: '/deliveries/add', title: 'Добавление поставок'},
+//     ],
+//     'suppliers': [{path: '/suppliers/all', title: 'Просмотр поставщиков'}, {path: '/suppliers/add', title: 'Добавление поставщика'}],
+// }
+
+const menuItems: Record<string, Array<{path: string, title: string, isAdmin?: boolean}>> = {
+    deliveries: [
+ //       { path: '/deliveries/lists', title: 'Просмотр листов поставок' },
+        { path: '/deliveries/all', title: 'Просмотр поставок' },
+        { path: '/deliveries/add', title: 'Добавление поставок', isAdmin: true },
+    ],
+    suppliers: [
+        { path: '/suppliers/all', title: 'Просмотр поставщиков' },
+ //       { path: '/suppliers/add', title: 'Добавление поставщика', isAdmin: true }
+    ],
+}
 
 const currentSection = computed(() => {
     return route.meta?.section as string || null
@@ -103,7 +106,12 @@ const currentSection = computed(() => {
 const currentItems = computed(() => {
     if (!currentSection.value) return []
 
-    return menuItems[currentSection.value] || []
+    const items = menuItems[currentSection.value] || []
+
+    return items.filter(item => {
+        if (item.isAdmin == undefined) return true
+        return item.isAdmin == userStore.isAdmin
+    })
 })
 
 const isActive = (path: string) => {

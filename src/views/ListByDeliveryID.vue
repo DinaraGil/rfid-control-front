@@ -78,7 +78,7 @@
 <template>
     <main class="content">
         <Menu />
-
+        <h4 class="content__title">Упаковочный лист поставки №{{ deliveryID }}</h4>
         <FilterSection />
         
         <section class="section container">
@@ -136,6 +136,10 @@
 </template>
 
 <style lang="scss">
+    .content__title {
+       padding-inline: var(--base-padding);
+       color: var(--color-dark-blue);
+    }
     .start {
         &__button {
             background-color: var(--color-green);

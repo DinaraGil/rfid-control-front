@@ -1,5 +1,6 @@
 .section {
-    padding: var(--base-padding);
+   padding-inline: var(--base-padding);
+   padding-block: var(--padding-small);
     &__title {
         text-align: center;
     }

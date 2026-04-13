@@ -9,9 +9,8 @@ interface User {
 
 export const useUserStore = defineStore('user', {
   state: () => ({
-    user: JSON.parse(localStorage.getItem('user') || 'null') as User | null,
-    token: localStorage.getItem('token') || null,
-    isAuthenticated: !!localStorage.getItem('token'),
+    user: null as User | null,
+    isAuthenticated: false,
   }),
   getters: {
     isAdmin: (state) => state.user?.role_id === 1,
@@ -26,6 +25,7 @@ export const useUserStore = defineStore('user', {
                 headers: {
                     "Content-Type": "application/json",
                 },
+                credentials: "include",
                 body: JSON.stringify({
                     username: username,
                     password: password,
@@ -46,11 +46,6 @@ export const useUserStore = defineStore('user', {
                 role_id: data.role_id
             }
            
-            this.token = data.token;
-            if (this.token) {
-                localStorage.setItem('token', this.token);
-                localStorage.setItem('user', JSON.stringify(this.user));
-            }
             this.isAuthenticated = true;
 
             router.push({ name: 'all-deliveries' });
@@ -59,17 +54,39 @@ export const useUserStore = defineStore('user', {
             throw error;
         }
     },
-    logout() {
+    async logout() {
+        await fetch("/api/auth/logout", {
+            method: "POST",
+            credentials: "include",
+        });
+
         this.user = null;
-        this.token = null;
         this.isAuthenticated = false;
-        
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
 
         router.push({ name: 'home' });
         
         console.log('Пользователь вышел из системы');
+    },
+    async fetchMe() {
+        try {
+            const response = await fetch("/api/auth/me", {
+                credentials: "include",
+            });
+
+            if (!response.ok) {
+                this.user = null;
+                this.isAuthenticated = false;
+                return;
+            }
+
+            const data = await response.json();
+
+            this.user = data;
+            this.isAuthenticated = true;
+        } catch {
+            this.user = null;
+            this.isAuthenticated = false;
+        }
     }
   }
 })

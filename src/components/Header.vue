@@ -37,6 +37,7 @@
                             <p>Поставки</p>
                         </div>
                     </router-link>
+                    <div v-if="userStore.isAdmin">
                     <router-link
                         :to="{ name: 'all-suppliers'}"
                         class="header__section"
@@ -56,6 +57,7 @@
                             <p>Поставщики</p>
                         </div>
                     </router-link>
+                    </div>
                 </div>    
             </div>
             <div v-if="userStore.isAuthenticated" class="header__authorized">
@@ -143,6 +145,7 @@
         .header__inner {
             background: var(--color-dark-green);
         }
+        
      }
 }
 </style>

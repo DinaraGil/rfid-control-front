@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<!-- <script setup lang="ts">
     import { ref, onMounted } from 'vue'
     import FilterSection from '@/components/FilterSection.vue'
     import Menu from '@/components/Menu.vue'
@@ -155,4 +155,4 @@
             color: #616161;
         }
     }
-</style>
+</style> -->
