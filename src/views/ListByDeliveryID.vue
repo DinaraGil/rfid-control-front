@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<!-- <script setup lang="ts">
     import { ref, onMounted } from 'vue'
     import { useUserStore } from '@/stores/user'
     import { useRoute, useRouter } from 'vue-router'
@@ -14,7 +14,8 @@
         delivery_list_id: number
         delivery_id: number
         supplier_id: number
-        amount: number
+        expected_amount: number
+        real_amount: number
         article: string
         created_by: number
         updated_by: number
@@ -102,7 +103,8 @@
                                     <th>Индентификатор листа поставки</th>
                                     <th>Идентификатор поставки</th>
                                     <th>Идентификатор поставщика</th>
-                                    <th>Количество</th>
+                                    <th>Ожидаемое количество</th>
+                                    <th>Полученное количество</th>
                                     <th>Артикул</th>
                                     <th>ID добавившего сотрудника</th>
                                     <th>ID изменившего сотрудника</th>
@@ -115,7 +117,8 @@
                                     <td>{{ list.delivery_list_id }}</td>
                                     <td>{{ list.delivery_id }}</td>
                                     <td>{{ list.supplier_id }}</td>
-                                    <td>{{ list.amount }}</td>
+                                    <td>{{ list.expected_amount }}</td>
+                                    <td>{{ list.real_amount }}</td>
                                     <td>{{ list.article }}</td>
                                     <td>{{ list.created_by }}</td>
                                     <td>{{ list.updated_by }}</td>
@@ -177,4 +180,4 @@
             color: #616161;
         }
     }
-</style>
+</style> -->

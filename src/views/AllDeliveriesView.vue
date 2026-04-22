@@ -63,7 +63,7 @@
         'IN_PROGRESS': 'В процессе',
         'IN-PROGRESS': 'В процессе',
         'COMPLETED': 'Завершена',
-        'CANCELLED': 'Отменена'
+        'ERROR': 'Ошибка'
     }
     return statusMap[status] || status
 }
@@ -75,7 +75,7 @@ const getStatusColor = (status: string) => {
         'IN_PROGRESS': 'status--progress',
         'IN-PROGRESS': 'status--progress',
         'COMPLETED': 'status--completed',
-        'CANCELLED': 'status--cancelled'
+        'ERROR': 'status--error'
     }
     return colorMap[status] || 'status--default'
 }
@@ -90,7 +90,7 @@ const getStatusColor = (status: string) => {
 
     const rowClicked = (delivery_id: number) => {
         router.push({ 
-            name: 'deliveriy-lists', 
+            name: 'start-deliveriy-lists', 
             params: { id: delivery_id } 
         })
     }
@@ -188,7 +188,7 @@ const getStatusColor = (status: string) => {
             color: #2e7d32;
         }
         
-        &--cancelled {
+        &--error {
             background-color: #ffebee;
             color: #c62828;
         }

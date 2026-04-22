@@ -1,5 +1,5 @@
 <script setup lang="ts">
-    import { ref, onMounted } from 'vue'
+    import { ref, onMounted, onBeforeUnmount, computed } from 'vue'
     import { useUserStore } from '@/stores/user'
     import { useRoute, useRouter } from 'vue-router'
     import FilterSection from '@/components/FilterSection.vue'
@@ -11,18 +11,22 @@
     const userStore = useUserStore()
     const socket = ref<WebSocket | null>(null)
     const isScanning = ref(false)
+    const scannerId = ref('')
+    const scannerError = ref<string | null>(null)
 
     interface DeliveryList {
         delivery_list_id: number
         delivery_id: number
         supplier_id: number
-        amount: number
+        expected_amount: number
+        real_amount: number
         article: string
         scanned?: boolean
         created_by: number
         updated_by: number
         created_at: string
         updated_at: string
+        status: string
     }
 
     const deliveryLists = ref<DeliveryList[]>([])
@@ -37,8 +41,6 @@
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
-                    // Добавляем токен авторизации, если нужно
-                    // 'Authorization': `Bearer ${localStorage.getItem('token')}`
                 }
             })
         
@@ -68,7 +70,10 @@
 
     onMounted(() => {
         fetchDeliveryLists()
-        connectSocket()
+    })
+
+    onBeforeUnmount(() => {
+      socket.value?.close()
     })
 
     const refreshData = () => {
@@ -76,15 +81,44 @@
     }
 
 const handleScanEvent = (data: any) => {
-  const { article } = data
-  const item = deliveryLists.value.find(l => l.article === article)
-  if (item) {
-    item.scanned = true
-  }
+  const updated = data
+  const item = deliveryLists.value.find(l => l.article === updated.article)
+  if (!item) return 
+
+  item.scanned = true
+  item.real_amount = updated.real_amount
+  item.updated_at = updated.updated_at
+  item.updated_by = updated.updated_by
+  item.status = updated.status
+
+  setTimeout(() => {
+    item.scanned = false
+  }, 800)
 }
 
 const connectSocket = () => {
-  socket.value = new WebSocket('ws://localhost:8080/ws/scan')
+  scannerError.value = null
+
+  const trimmedScannerId = scannerId.value.trim()
+
+  if (!trimmedScannerId) {
+    scannerError.value = 'Введите номер сканнера'
+    return
+  }
+
+  if (!/^\d+$/.test(trimmedScannerId)) {
+    scannerError.value = 'Номер сканнера должен быть числом'
+    return
+  }
+
+  const wsUrl = `ws://localhost:8080/ws/deliveries/${deliveryID.value}/scanners/${encodeURIComponent(trimmedScannerId)}`
+
+  socket.value = new WebSocket(wsUrl)
+
+  socket.value.onopen = () => {
+    console.log('WS connected')
+    isScanning.value = true
+  }
 
   socket.value.onmessage = (event) => {
     const data = JSON.parse(event.data)
@@ -93,93 +127,225 @@ const connectSocket = () => {
 
   socket.value.onclose = () => {
     console.log('WS closed')
+    socket.value = null
+    isScanning.value = false
+  }
+
+  socket.value.onerror = () => {
+    scannerError.value = 'Ошибка подключения к WebSocket'
   }
 }
 
-const toggleScan = () => {
-  if (!isScanning.value) {
-    connectSocket()
-  } else {
-    socket.value?.close()
+const completeDelivery = async () => {
+  try {
+    const response = await fetch(`/api/deliveries/${deliveryID.value}/complete`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+
+    if (!response.ok) {
+      throw new Error('Ошибка завершения поставки')
+    }
+
+    console.log('Поставка завершена')
+  } catch (err) {
+    console.error(err)
+  }
+}
+
+const finishScan = async () => {
+  socket.value?.close()
+  await completeDelivery()
+}
+
+const getRowClass = (status: string, scanned?: boolean) => {
+  return {
+    'row--not-enough': status?.toLowerCase() === 'not_enough',
+    'row--completed': status?.toLowerCase() === 'completed',
+    'row--overmuch': status?.toLowerCase() === 'overmuch',
+    'row--scanned': !!scanned
+  }
+}
+
+const translateStatus = (status: string) => {
+  const map: Record<string, string> = {
+    'NEW': 'Новая',
+    'NOT_ENOUGH': 'Недостаток',
+    'COMPLETED': 'Завершена',
+    'OVERMUCH': 'Излишек'
   }
 
-  isScanning.value = !isScanning.value
+  return map[status] || status
 }
 
 </script>
 
 <template>
-    <main class="content">
-        <Menu />
+  <main class="content">
+    <Menu />
 
-        <FilterSection />
-        
-        <section class="section container">
-            <div class="section__body">
-                <button
-                v-if="userStore.isWorker"
-                @click="toggleScan"
-                >
-                {{ isScanning ? 'Закончить прием' : 'Начать прием' }}
-                </button>
-                <div class="table-section">
-                    <div class="table-section__body">
-                        <a href="/" class="table-section__icon">
-                            <img class="table-section__refresh" src="/images/icons/refresh.svg" alt="refresh" width="24"
-                                height="24" loading="lazy" />
-                        </a>
-                        <div v-if="error" class="table-section__error">
-                            {{ error }}
-                        </div>
+    <h3 style="padding-inline: var(--base-padding);">Прием поставки {{ deliveryID }}</h3>
 
-                        <table v-else-if="deliveryLists.length > 0" class="table-section__content">
-                            <thead class="table-section__head">
-                                <tr>
-                                    <th>Индентификатор листа поставки</th>
-                                    <th>Идентификатор поставки</th>
-                                    <th>Идентификатор поставщика</th>
-                                    <th>Количество</th>
-                                    <th>Артикул</th>
-                                    <th>ID добавившего сотрудника</th>
-                                    <th>ID изменившего сотрудника</th>
-                                    <th>Время добавления</th>
-                                    <th>Время изменения</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr v-for="list in deliveryLists" :key="list.delivery_list_id" :class="{ 'row--scanned': list.scanned }">
-                                    <td>{{ list.delivery_list_id }}</td>
-                                    <td>{{ list.delivery_id }}</td>
-                                    <td>{{ list.supplier_id }}</td>
-                                    <td>{{ list.amount }}</td>
-                                    <td>{{ list.article }}</td>
-                                    <td>{{ list.created_by }}</td>
-                                    <td>{{ list.updated_by }}</td>
-                                    <td>{{ formatDate(list.created_at) }}</td>
-                                    <td>{{ formatDate(list.updated_at) }}</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        <div v-else class="table-section__empty">
-                            Нет данных для отображения
-                        </div>
-                    </div>
-                </div>
+    <FilterSection />
+
+    <section class="section container">
+      <div class="section__body">
+        <div v-if="userStore.isWorker" class="scanner-form">
+          <label for="scanner">Номер сканнера:</label>
+          <input
+            id="scanner"
+            v-model="scannerId"
+            type="text"
+            name="scanner"
+            placeholder="1"
+            required
+            :disabled="isScanning"
+          />
+
+          <button @click="connectSocket" v-if="!isScanning">
+            Начать прием
+          </button>
+
+          <button @click="finishScan" v-else>
+            Завершить прием
+          </button>
+
+          <div v-if="scannerError" class="table-section__error">
+            {{ scannerError }}
+          </div>
+        </div>
+
+        <div class="table-section">
+          <div class="table-section__body">
+            <button type="button" class="table-section__icon" @click="refreshData">
+              <img
+                class="table-section__refresh"
+                src="/images/icons/refresh.svg"
+                alt="refresh"
+                width="24"
+                height="24"
+                loading="lazy"
+              />
+            </button>
+
+            <div v-if="error" class="table-section__error">
+              {{ error }}
             </div>
-        </section>
-        <p>Пагинация</p>
-    </main>
+
+            <table v-else-if="deliveryLists.length > 0" class="table-section__content">
+              <thead class="table-section__head">
+                <tr>
+                  <th>Индентификатор листа поставки</th>
+                  <th>Идентификатор поставки</th>
+                  <th>Идентификатор поставщика</th>
+                  <th>Ожидаемое количество</th>
+                  <th>Полученное количество</th>
+                  <th>Артикул</th>
+                  <th>ID добавившего сотрудника</th>
+                  <th>ID изменившего сотрудника</th>
+                  <th>Статус</th>
+                  <th>Время добавления</th>
+                  <th>Время изменения</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  v-for="list in deliveryLists"
+                  :key="list.delivery_list_id"
+                  :class="getRowClass(list.status, list.scanned)"
+                >
+                  <td>{{ list.delivery_list_id }}</td>
+                  <td>{{ list.delivery_id }}</td>
+                  <td>{{ list.supplier_id }}</td>
+                  <td>{{ list.expected_amount }}</td>
+                  <td>{{ list.real_amount }}</td>
+                  <td>{{ list.article }}</td>
+                  <td>{{ list.created_by }}</td>
+                  <td>{{ list.updated_by }}</td>
+                  <td>{{ translateStatus(list.status) }}</td>
+                  <td>{{ formatDate(list.created_at) }}</td>
+                  <td>{{ formatDate(list.updated_at) }}</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <div v-else class="table-section__empty">
+              Нет данных для отображения
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <p>Пагинация</p>
+  </main>
 </template>
 
 <style lang="scss">
-    .row--scanned {
-  background-color: #e8f5e8;
-  animation: flash 0.5s ease;
+.row--not-enough {
+  background-color: #fff3cd;
 }
 
-@keyframes flash {
-  from { background-color: #fff59d; }
-  to { background-color: #e8f5e8; }
+.row--completed {
+  background-color: #d4edda;
+}
+
+.row--overmuch {
+  background-color: #f8d7da;
+}
+
+.row--scanned {
+  animation: flashOutline 0.8s ease;
+}
+
+@keyframes flashOutline {
+  0% {
+    box-shadow: inset 0 0 0 9999px rgba(255, 245, 157, 0.9);
+  }
+  100% {
+    box-shadow: inset 0 0 0 9999px rgba(255, 245, 157, 0);
+  }
+}
+
+.breadcrumbs {
+  margin-bottom: 20px;
+
+  &__list {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+
+  &__item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+  }
+
+  &__link {
+    color: #1976d2;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  &__current {
+    color: #616161;
+    font-weight: 500;
+  }
+
+  &__separator {
+    color: #9e9e9e;
+  }
 }
 
     .start {
@@ -219,4 +385,7 @@ const toggleScan = () => {
             color: #616161;
         }
     }
+
+
+    
 </style>

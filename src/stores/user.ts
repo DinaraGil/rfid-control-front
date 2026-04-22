@@ -11,6 +11,7 @@ export const useUserStore = defineStore('user', {
   state: () => ({
     user: null as User | null,
     isAuthenticated: false,
+    isAuthChecked: false,
   }),
   getters: {
     isAdmin: (state) => state.user?.role_id === 1,
@@ -47,6 +48,7 @@ export const useUserStore = defineStore('user', {
             }
            
             this.isAuthenticated = true;
+            this.isAuthChecked = true;
 
             router.push({ name: 'all-deliveries' });
             return data;
@@ -62,6 +64,7 @@ export const useUserStore = defineStore('user', {
 
         this.user = null;
         this.isAuthenticated = false;
+        this.isAuthChecked = true;
 
         router.push({ name: 'home' });
         
@@ -86,6 +89,8 @@ export const useUserStore = defineStore('user', {
         } catch {
             this.user = null;
             this.isAuthenticated = false;
+        } finally {
+            this.isAuthChecked = true
         }
     }
   }
