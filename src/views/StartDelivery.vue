@@ -186,7 +186,7 @@ const translateStatus = (status: string) => {
   <main class="content">
     <Menu />
 
-    <h3 style="padding-inline: var(--base-padding);">Прием поставки {{ deliveryID }}</h3>
+    <h3 style="padding-inline: var(--base-padding);">Поставка {{ deliveryID }}</h3>
 
     <FilterSection />
 

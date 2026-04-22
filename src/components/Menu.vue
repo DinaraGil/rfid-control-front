@@ -78,18 +78,8 @@ const userStore = useUserStore()
 const route = useRoute()
 
 
-// const menuItems: Record<string, Array<{path: string, title: string}>> = {
-//     'deliveries': [
-//         {path: '/deliveries/lists', title: 'Просмотр листов поставок'},
-//         {path: '/deliveries/all', title: 'Просмотр поставок'},
-//         {path: '/deliveries/add', title: 'Добавление поставок'},
-//     ],
-//     'suppliers': [{path: '/suppliers/all', title: 'Просмотр поставщиков'}, {path: '/suppliers/add', title: 'Добавление поставщика'}],
-// }
-
 const menuItems: Record<string, Array<{path: string, title: string, isAdmin?: boolean}>> = {
     deliveries: [
- //       { path: '/deliveries/lists', title: 'Просмотр листов поставок' },
         { path: '/deliveries/all', title: 'Просмотр поставок' },
         { path: '/deliveries/add', title: 'Добавление поставок', isAdmin: true },
     ],
@@ -97,6 +87,9 @@ const menuItems: Record<string, Array<{path: string, title: string, isAdmin?: bo
         { path: '/suppliers/all', title: 'Просмотр поставщиков' },
  //       { path: '/suppliers/add', title: 'Добавление поставщика', isAdmin: true }
     ],
+    // reports: [
+    //     {path: '/reports/stocks', title: 'По остаткам'},
+    // ]
 }
 
 const currentSection = computed(() => {

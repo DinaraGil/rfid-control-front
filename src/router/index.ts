@@ -2,10 +2,11 @@ import { createRouter, createWebHistory } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import LoginView from '@/views/LoginView.vue'
 import MainPageView from '@/views/MainPageView.vue'
-import DeliveryView from '@/views/DeliveryView.vue'
+import ReportsView from '@/views/ReportsView.vue'
 import AllDeliveriesView from '@/views/AllDeliveriesView.vue'
 import AddDeliveryView from '@/views/AddDeliveryView.vue'
 import SuppliersView from '@/views/SuppliersView.vue'
+import StocksView from '@/views/StocksView.vue'
 //import AllDeliveryListsView from '@/views/AllDeliveryListsView.vue'
 //import ListByDeliveryID from '@/views/ListByDeliveryID.vue'
 import StartDelivery from '@/views/StartDelivery.vue'
@@ -31,18 +32,6 @@ const router = createRouter({
       component: AllDeliveriesView,
       meta: { section: 'deliveries' }
     },
-    // {
-    //   path: '/deliveries/lists',
-    //   name: 'all-deliveries-lists',
-    //   component: AllDeliveryListsView,
-    //   meta: { section: 'deliveries' }
-    // },
-    // {
-    //   path: '/deliveries/:id/lists',
-    //   name: 'deliveriy-lists',
-    //   component: ListByDeliveryID,
-    //   meta: { section: 'deliveries' }
-    // },
     {
       path: '/deliveries/:id/lists/start',
       name: 'start-deliveriy-lists',
@@ -73,6 +62,23 @@ const router = createRouter({
       component: SuppliersView,
       meta: {
         section: 'suppliers',
+        requiresAdmin: true
+      }
+    },
+    {
+      path: '/stocks',
+      name: 'get-stocks',
+      component: StocksView,
+      meta: {
+        requiresAdmin: true
+      }
+    },
+    {
+      path: '/reports',
+      name: 'get-reports',
+      component: ReportsView,
+      meta: {
+        section: 'reports',
         requiresAdmin: true
       }
     },

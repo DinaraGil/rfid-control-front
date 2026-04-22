@@ -58,6 +58,48 @@
                         </div>
                     </router-link>
                     </div>
+                    <div v-if="userStore.isAdmin">
+                        <router-link
+                            :to="{ name: 'get-stocks'}"
+                            class="header__section"
+                            :class="{ 'header__section--active': isPathActive('/stocks') }"
+                        >
+                            <div class="header__icon">
+                                <img
+                                    class="logo__image"
+                                    src="/images/icons/notebook.svg"
+                                    alt="notebook_icon"
+                                    width="24"
+                                    height="24"
+                                    loading="lazy"
+                                />
+                            </div>
+                            <div class="header__description">
+                                <p>Остатки</p>
+                            </div>
+                        </router-link>
+                    </div>
+                    <div v-if="userStore.isAdmin">
+                        <router-link
+                            :to="{ name: 'get-reports'}"
+                            class="header__section"
+                            :class="{ 'header__section--active': isPathActive('/reports') }"
+                        >
+                            <div class="header__icon">
+                                <img
+                                    class="logo__image"
+                                    src="/images/icons/document.svg"
+                                    alt="document_icon"
+                                    width="24"
+                                    height="24"
+                                    loading="lazy"
+                                />
+                            </div>
+                            <div class="header__description">
+                                <p>Отчеты</p>
+                            </div>
+                        </router-link>
+                    </div>
                 </div>    
             </div>
             <div v-if="userStore.isAuthenticated" class="header__authorized">
