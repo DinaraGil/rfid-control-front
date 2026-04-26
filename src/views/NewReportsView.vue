@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed, watch } from 'vue'
 import Menu from '@/components/Menu.vue'
 
 const error = ref<string>('')
@@ -7,9 +7,44 @@ const loading = ref<boolean>(false)
 const success = ref<boolean>(false)
 const reportResult = ref<any>(null)
 
+const deliveryId = ref('')
 const reportOption = ref('stock')
 const dateFrom = ref('2026-04-22')
 const dateTo = ref('2026-04-22')
+const deliveryStatus = ref('NEW')
+
+const isStockReport = computed(() => reportOption.value === 'stock')
+const isDeliveriesReport = computed(() => reportOption.value === 'deliveries')
+
+const statusOptions = computed(() => {
+  if (reportOption.value === 'deliveries') {
+    return [
+      { value: 'NEW', label: 'Новые' },
+      { value: 'COMPLETED', label: 'Завершенные' },
+      { value: 'ERROR', label: 'Ошибочные' }
+    ]
+  }
+
+  return [
+    { value: 'NEW', label: 'Новые' },
+    { value: 'COMPLETED', label: 'Завершенные' },
+    { value: 'ERROR', label: 'Ошибочные' },
+    { value: 'OVERMUCH', label: 'Излишек' },
+    { value: 'NOT_ENOUGH', label: 'Недостаток' }
+  ]
+})
+
+watch(reportOption, () => {
+  if (isStockReport.value) {
+    deliveryStatus.value = ''
+    deliveryId.value = ''
+    dateFrom.value = ''
+    dateTo.value = ''
+    return
+  }
+
+  deliveryStatus.value = statusOptions.value[0]?.value || ''
+})
 
 const createReport = async () => {
   loading.value = true
@@ -25,6 +60,7 @@ const createReport = async () => {
       },
       body: JSON.stringify({
         report_type: reportOption.value,
+        delivery_status: deliveryStatus.value,
         date_from: dateFrom.value,
         date_to: dateTo.value
       })
@@ -66,11 +102,49 @@ const createReport = async () => {
               v-model="reportOption"
               class="report-form__control"
             >
-              <option value="stock">По остаткам</option>
-              <option value="delivery_errors">Ошибочные поставки</option>
-              <option value="deliveries">Все поставки</option>
-              <option value="items">Все товары</option>
+              <option value="stock">Остатки</option>
+              <option value="deliveries">Поставки</option>
+              <option value="delivery_lists">Упаковочные листы</option>
+              <option value="items">Товары</option>
             </select>
+          </div>
+
+          <div class="report-form__row">
+            <div class="report-form__group">
+              <label for="delivery_status" class="report-form__label">
+                Статус
+              </label>
+              <select
+                id="delivery_status"
+                name="delivery_status"
+                v-model="deliveryStatus"
+                class="report-form__control"
+                :disabled="isStockReport"
+              >
+                <option
+                  v-for="status in statusOptions"
+                  :key="status.value"
+                  :value="status.value"
+                >
+                  {{ status.label }}
+                </option>
+              </select>
+            </div>
+
+            <div class="report-form__group">
+              <label for="delivery_id" class="report-form__label">
+                Номер поставки
+              </label>
+              <input
+                id="delivery_id"
+                name="delivery_id"
+                v-model="deliveryId"
+                type="number"
+                class="report-form__control"
+                placeholder="Например, 12"
+                :disabled="isStockReport"
+              />
+            </div>
           </div>
 
           <div class="report-form__row">
@@ -84,6 +158,7 @@ const createReport = async () => {
                 min="2026-01-01"
                 max="2026-12-31"
                 class="report-form__control"
+                :disabled="isStockReport"
               />
             </div>
 
@@ -97,6 +172,7 @@ const createReport = async () => {
                 min="2026-01-01"
                 max="2026-12-31"
                 class="report-form__control"
+                :disabled="isStockReport"
               />
             </div>
           </div>
@@ -198,6 +274,13 @@ const createReport = async () => {
   }
 
   &__control {
+    &:disabled {
+      background: #f3f4f6;
+      color: #9ca3af;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+
     width: 100%;
     min-height: 46px;
     padding: 0 14px;
