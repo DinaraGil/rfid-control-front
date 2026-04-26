@@ -87,9 +87,10 @@ const menuItems: Record<string, Array<{path: string, title: string, isAdmin?: bo
         { path: '/suppliers/all', title: 'Просмотр поставщиков' },
  //       { path: '/suppliers/add', title: 'Добавление поставщика', isAdmin: true }
     ],
-    // reports: [
-    //     {path: '/reports/stocks', title: 'По остаткам'},
-    // ]
+    reports: [
+        {path: '/reports/all', title: 'Просмотр отчетов'},
+        {path: '/reports/new', title: 'Создать новый'},
+    ]
 }
 
 const currentSection = computed(() => {

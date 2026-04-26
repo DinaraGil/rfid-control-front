@@ -81,7 +81,7 @@
                     </div>
                     <div v-if="userStore.isAdmin">
                         <router-link
-                            :to="{ name: 'get-reports'}"
+                            :to="{ name: 'all-reports'}"
                             class="header__section"
                             :class="{ 'header__section--active': isPathActive('/reports') }"
                         >

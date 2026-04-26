@@ -2,7 +2,8 @@ import { createRouter, createWebHistory } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import LoginView from '@/views/LoginView.vue'
 import MainPageView from '@/views/MainPageView.vue'
-import ReportsView from '@/views/ReportsView.vue'
+import NewReportsView from '@/views/NewReportsView.vue'
+import AllReportsView from '@/views/AllReportsView.vue'
 import AllDeliveriesView from '@/views/AllDeliveriesView.vue'
 import AddDeliveryView from '@/views/AddDeliveryView.vue'
 import SuppliersView from '@/views/SuppliersView.vue'
@@ -74,9 +75,18 @@ const router = createRouter({
       }
     },
     {
-      path: '/reports',
-      name: 'get-reports',
-      component: ReportsView,
+      path: '/reports/new',
+      name: 'new-reports',
+      component: NewReportsView,
+      meta: {
+        section: 'reports',
+        requiresAdmin: true
+      }
+    },
+    {
+      path: '/reports/all',
+      name: 'all-reports',
+      component: AllReportsView,
       meta: {
         section: 'reports',
         requiresAdmin: true

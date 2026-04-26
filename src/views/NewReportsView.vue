@@ -18,7 +18,7 @@ const createReport = async () => {
   reportResult.value = null
 
   try {
-    const response = await fetch('/api/report', {
+    const response = await fetch('/api/reports/new', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -46,6 +46,7 @@ const createReport = async () => {
 </script>
 <template>
   <main class="content">
+    <Menu />
     <section class="report-section">
       <div class="report-card">
         <div class="report-card__header">
@@ -117,7 +118,21 @@ const createReport = async () => {
           Отчет успешно создан
         </div>
 
-        <pre v-if="reportResult" class="report-result">{{ reportResult }}</pre>
+        <div v-if="reportResult?.link" class="download">
+          <div class="download__file">
+            <span class="download__name">
+              📄 {{ reportResult.filename }}
+            </span>
+
+            <a
+              :href="reportResult.link"
+              target="_blank"
+              class="download__link"
+            >
+              скачать
+            </a>
+          </div>
+        </div>
       </div>
     </section>
   </main>
@@ -284,6 +299,37 @@ const createReport = async () => {
   .report-form {
     &__row {
       grid-template-columns: 1fr;
+    }
+  }
+}
+
+.download {
+  margin-top: 20px;
+
+  &__file {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 12px 14px;
+    border-radius: 12px;
+
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+  }
+
+  &__name {
+    font-size: 14px;
+    color: #111827;
+  }
+
+  &__link {
+    color: #2563eb;
+    text-decoration: underline;
+    font-size: 13px;
+
+    &:hover {
+      color: #1d4ed8;
     }
   }
 }
