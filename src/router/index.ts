@@ -5,12 +5,15 @@ import MainPageView from '@/views/MainPageView.vue'
 import NewReportsView from '@/views/NewReportsView.vue'
 import AllReportsView from '@/views/AllReportsView.vue'
 import AllDeliveriesView from '@/views/AllDeliveriesView.vue'
+import AllShipmentsView from '@/views/AllShipmentsView.vue'
 import AddDeliveryView from '@/views/AddDeliveryView.vue'
 import SuppliersView from '@/views/SuppliersView.vue'
 import StocksView from '@/views/StocksView.vue'
 //import AllDeliveryListsView from '@/views/AllDeliveryListsView.vue'
 //import ListByDeliveryID from '@/views/ListByDeliveryID.vue'
 import StartDelivery from '@/views/StartDelivery.vue'
+import StartShipmentView from '@/views/StartShipmentView.vue'
+import AddShipmentView from '@/views/AddShipmentView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -49,6 +52,27 @@ const router = createRouter({
       }
     },
     {
+      path: '/shipments/all',
+      name: 'all-shipments',
+      component: AllShipmentsView,
+      meta: { section: 'shipments' }
+    },
+    {
+      path: '/shipments/add',
+      name: 'add-shipment',
+      component: AddShipmentView,
+      meta: {
+        section: 'shipments',
+        requiresAdmin: true
+      }
+    },
+    {
+      path: '/shipments/:id/lists/start',
+      name: 'start-shipment-lists',
+      component: StartShipmentView,
+      meta: { section: 'shipments' }
+    },
+    {
       path: '/suppliers/all',
       name: 'all-suppliers',
       component: SuppliersView,
@@ -70,9 +94,6 @@ const router = createRouter({
       path: '/stocks',
       name: 'get-stocks',
       component: StocksView,
-      meta: {
-        requiresAdmin: true
-      }
     },
     {
       path: '/reports/new',

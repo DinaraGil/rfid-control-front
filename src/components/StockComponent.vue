@@ -63,10 +63,6 @@
 
 <template>
     <main class="content">
-        <Menu />
-
-        <FilterSection />
-        
         <section class="section container">
             <div class="section__body">
                 <div class="table-section">
@@ -89,7 +85,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr v-for="stock in stocks" :key="stock.article" class="table-section--active">
+                                <tr v-for="stock in stocks" :key="stock.article" class="table-section">
                                     <td>{{ stock.article }}</td>
                                     <td>{{ stock.quantity }}</td>
                                     <td>{{ stock.reserved }}</td>
@@ -104,7 +100,6 @@
                 </div>
             </div>
         </section>
-        <p>Пагинация</p>
     </main>
 </template>
 

@@ -111,7 +111,7 @@ const connectSocket = () => {
     return
   }
 
-  const wsUrl = `ws://localhost:8080/ws/deliveries/${deliveryID.value}/scanners/${encodeURIComponent(trimmedScannerId)}`
+  const wsUrl = `ws://localhost:8080/ws/delivery/${deliveryID.value}/scanners/${encodeURIComponent(trimmedScannerId)}`
 
   socket.value = new WebSocket(wsUrl)
 
@@ -121,14 +121,23 @@ const connectSocket = () => {
   }
 
   socket.value.onmessage = (event) => {
-    const data = JSON.parse(event.data)
-    handleScanEvent(data)
+  const data = JSON.parse(event.data)
+
+  if (data.error) {
+    scannerError.value = data.error
+    return
   }
+
+  scannerError.value = null
+
+  handleScanEvent(data)
+}
 
   socket.value.onclose = () => {
     console.log('WS closed')
     socket.value = null
     isScanning.value = false
+    completeDelivery()
   }
 
   socket.value.onerror = () => {

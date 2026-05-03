@@ -83,6 +83,10 @@ const menuItems: Record<string, Array<{path: string, title: string, isAdmin?: bo
         { path: '/deliveries/all', title: 'Просмотр поставок' },
         { path: '/deliveries/add', title: 'Добавление поставок', isAdmin: true },
     ],
+    shipments: [
+        { path: '/shipments/all', title: 'Просмотр отгрузок' },
+        { path: '/shipments/add', title: 'Добавление отрузок', isAdmin: true },
+    ],
     suppliers: [
         { path: '/suppliers/all', title: 'Просмотр поставщиков' },
  //       { path: '/suppliers/add', title: 'Добавление поставщика', isAdmin: true }

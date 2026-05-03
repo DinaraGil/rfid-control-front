@@ -100,6 +100,25 @@
                             </div>
                         </router-link>
                     </div>
+                        <router-link
+                            :to="{ name: 'all-shipments'}"
+                            class="header__section"
+                            :class="{ 'header__section--active': isPathActive('/shipments') }"
+                        >
+                            <div class="header__icon">
+                                <img
+                                    class="logo__image"
+                                    src="/images/icons/box.svg"
+                                    alt="document_icon"
+                                    width="24"
+                                    height="24"
+                                    loading="lazy"
+                                />
+                            </div>
+                            <div class="header__description">
+                                <p>Отгрузки</p>
+                            </div>
+                        </router-link>
                 </div>    
             </div>
             <div v-if="userStore.isAuthenticated" class="header__authorized">
